@@ -1,61 +1,45 @@
 function getComputerChoice() {
-    let randomValue = Math.floor(Math.random()*10);
-    let computerChoice;
-    switch(true) {
-        case randomValue <= 3: 
-            computerChoice = "Rock";
-            break;
-        case randomValue > 3 && randomValue <= 6 : 
-            computerChoice = "Paper";
-            break;
-        case randomValue > 6:
-            computerChoice = "Scissors"
-            break;
-    }
-    return computerChoice;
+    const choices = ["Rock", "Paper", "Scissors"];
+    return choices[Math.floor(Math.random() * 3)];
 }
 
-function getHumanChoice() {
-    let humanChoice = prompt("Enter your move");
-    humanChoice = humanChoice.at(0).toUpperCase() + humanChoice.slice(1);
-    return humanChoice;
-}
+const displayHumanChoice = document.querySelector(".user-choice");
+const displayComputerChoice = document.querySelector(".computer-choice");
+const winnerDisplay = document.querySelector("#winner");
+const buttons = document.querySelector(".buttons");
 
 let humanScore = 0, computerScore = 0;
-let winner;
 
 function playRound(humanChoice, computerChoice) {
-    if (computerChoice === humanChoice) {
-        winner = "Draw";
+    if (humanChoice === computerChoice) return "Draw";
+    const humanWins =
+        (humanChoice === "Rock" && computerChoice === "Scissors") ||
+        (humanChoice === "Paper" && computerChoice === "Rock") ||
+        (humanChoice === "Scissors" && computerChoice === "Paper");
+    return humanWins ? "Human" : "Computer";
+}
+
+buttons.addEventListener("click", (e) => {
+    if (e.target.tagName !== "BUTTON") return;
+    if (humanScore >= 5 || computerScore >= 5) return; // game over
+
+    const humanChoice = e.target.textContent;
+    const computerChoice = getComputerChoice();
+    const winner = playRound(humanChoice, computerChoice);
+
+    displayHumanChoice.textContent = humanChoice;
+    displayComputerChoice.textContent = computerChoice;
+
+    if (winner === "Human") {
+        humanScore++;
+        winnerDisplay.textContent = "You won this round!";
+    } else if (winner === "Computer") {
+        computerScore++;
+        winnerDisplay.textContent = "Computer won this round!";
     } else {
-        switch (humanChoice) {
-            case "Rock": computerChoice === "Paper" ? winner = "Computer" : winner = "Human";
-            break;
-            case "Paper": computerChoice === "Rock" ? winner = "Human" : winner = "Computer";
-            break;
-            case "Scissors": computerChoice === "Rock" ? winner = "Computer" : winner = "Human";
-            break;
-        }
-    
+        winnerDisplay.textContent = "It's a draw!";
     }
-    return winner;
-}
 
-
-function playGame(){
-    for (let i =0; i<5; i++) {
-        let humanSelection = getHumanChoice();
-        let computerSelection = getComputerChoice();
-        winner = playRound(humanSelection,computerSelection);
-        switch(winner) {
-            case "Human": alert("You won!!!");
-                break;
-            case "Computer": alert("You lost :-(");
-                break;
-            case "Draw": alert("It's a draw.");
-                break;
-         }
-    }
-}
-
-playGame();
+    if (humanScore === 5) winnerDisplay.textContent = "You won the game!";
+    else if (computerScore === 5) winnerDisplay.textContent = "Computer won the game!";
+});
